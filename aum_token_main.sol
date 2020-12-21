@@ -133,7 +133,7 @@ contract ERC20Token is IToken {
         return owner;
     }
 
-    // 只有智能合约的所有者才能调用的方法
+    // 
     modifier onlyOwner(){
         require(msg.sender == owner, "Ownable: caller is not the owner");
         _;

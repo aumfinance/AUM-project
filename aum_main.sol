@@ -162,17 +162,17 @@ contract bat {
 
     uint256 ONE_DAY = 1 days;
 
-    //TODO 修改开始
-    address tokenAddr = 0x7CA22568897DaC4A6F9a8E3517f3939aAAfa60dc;//代币地址
-    uint256 ONE_TOKEN = 1 * 10 ** 18;//注意，默认精度是18，如需求修改精度，只改变这个18，其他不要改
-    address foundationAddr = 0x5b34A3e406A8c19c3A0dcdA93B01d63bA81BD239;//基金会地址
-    address devAddr = 0x5b34A3e406A8c19c3A0dcdA93B01d63bA81BD239;//运营方
-    address lpGameAddr = 0xa5436dcc5B91198F3E8B957e26176A13fE04f733;//LP质押合约
-    address ethRecAddr = 0x5b34A3e406A8c19c3A0dcdA93B01d63bA81BD239;//众筹接收以太坊地址
-    //TODO 修改结束
+    //TODO 
+    address tokenAddr = 0x5A947A3e5B62Cb571C056eC28293b32126E4d743;//
+    uint256 ONE_TOKEN = 1 * 10 ** 18;//
+    address foundationAddr = 0x4FE86109DB7B0fA397bF15E3d667A7B440725EaF;//
+    address devAddr = 0x0000000000000000000000000000000000000000;//
+    address lpGameAddr = 0xF4a7f38aF76041e4C75a5eCFf590d502A5B5AEa1;//
+    address ethRecAddr = 0xDeDac392ff406836Aa945d8C8d3420F0357cdBC7;//
+    //TODO 
 
 
-    address owner;//创建者
+    address owner;//
 
     Order[] orderArr;
     mapping(address => User) userMap;
@@ -245,7 +245,10 @@ contract bat {
         (uint256 curRound,,) = getRound();
         require(curRound != 0, "time not");
         require(curRound < 4, " time end ");
-        require(msg.value >= 1 ether / 10, "more 0.1");
+        uint256 tempValue = 1 ether / 10;
+        require(msg.value >= tempValue, "more 0.1");
+        require(msg.value % tempValue == 0, "0.1 multiples");
+
 
         {
             uint256 smRe;
@@ -462,19 +465,19 @@ contract bat {
         bool success = token.call(id, to, value);
         require(success, 'TransferHelper: TRANSFER_FAILED');
     }
-    //测试返回总池信息
-    //私募总池，所有有效质押总数，当前奖池,销毁掉的token
+    //
+    //
     function showSysInfo() public view returns (uint256, uint256, uint256, uint256){
         (uint256 totalKey,) = getTotalKey();
         return (smTotal, totalKey, bonusPoolAmount, investTotal);
     }
-    //测试返回用户信息
-    //邀请奖励，奖池奖励，可提静态收益，伞下一级的总质押量，个人所有质押量
+    //
+    //
     function showUserInfo(address _addr) public view returns (uint256, uint256){
         User  memory user = userMap[_addr];
         return (user.smRewardsAmount, user.smInvestAmount);
     }
-    //邀请奖励，奖池奖励，静态收益，团队总质押量，个人质押量,邀请一代数量，邀请二代数量
+    //
     function showUserInfoNew(address _addr) public view returns (uint256, uint256, uint256, uint256, uint256, uint256, uint256){
         uint256 staticAmount = getStaticBonus(_addr);
         uint256 teamInvestTotalAmount = getTeamInvest(_addr);
@@ -751,14 +754,23 @@ contract bat {
 
     function getSmRealTokenAmount333(uint256 curRound, uint256 inputAmount) internal pure returns (uint256, uint256){
         (uint256 rate1,uint256 rate2) = getEthRate(curRound);
-        return (inputAmount * rate1 / 10, inputAmount * rate2);
+        return (inputAmount * rate1, inputAmount * rate2);
     }
 
     function getEthRate(uint256 round) public pure returns (uint256, uint256){
         if (round < 1 || round > 3) {
             return (0, 0);
         }
-        return (20 - (round * 5), 10);
+        if (round == 1) {
+            return (10, 10);
+        }
+        if (round == 2) {
+            return (7, 10);
+        }
+        if (round == 3) {
+            return (5, 10);
+        }
+        return (0, 0);
     }
 
 
